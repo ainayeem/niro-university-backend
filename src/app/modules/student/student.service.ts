@@ -1,20 +1,31 @@
 import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
+import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
+import { studentSearchableFields } from "./student.constant";
 import { TStudent } from "./student.interface";
 import { Student } from "./student.model";
 
-const getAllStudentsFromDB = async () => {
-  const result = await Student.find()
-    .populate("admissionSemester")
-    .populate({
-      path: "academicDepartment",
-      populate: {
-        path: "academicFaculty",
-      },
-    });
+const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
+  const studentQuery = new QueryBuilder(
+    Student.find()
+      .populate("admissionSemester")
+      .populate({
+        path: "academicDepartment",
+        populate: {
+          path: "academicFaculty",
+        },
+      }),
+    query,
+  )
+    .search(studentSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
+  const result = await studentQuery.modelQuery;
   return result;
 };
 
@@ -103,10 +114,11 @@ const deleteStudentFromDB = async (id: string) => {
     await session.endSession();
 
     return deletedStudent;
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error("Failed to delete student");
+    throw new Error(err);
   }
 };
 
