@@ -10,12 +10,14 @@
     "lint:fix": "eslint src/**/*.ts --fix",
     "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
     "prettier:fix": "npx prettier --write src",
+    "deploy": "npx vercel --prod",
+    "release": "npm run prettier && npm run lint:fix && npm run lint && npm run build && npm run deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "nayeem",
   "license": "ISC",
-  "description": "",
+  "description": "An university management system backend",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
