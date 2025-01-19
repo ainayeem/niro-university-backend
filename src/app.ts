@@ -18,7 +18,7 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!hi");
+  res.send("Welcome to niro university backend");
 });
 
 app.use(globalErrorHandler);
