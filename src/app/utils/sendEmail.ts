@@ -7,8 +7,8 @@ export const sendEmail = async (to: string, passResetLink: string) => {
     port: 587,
     secure: config.node_env === "production", // prod e true hobe
     auth: {
-      user: config.smtp_user,
-      pass: config.smtp_pass,
+      user: "ainnayeem9@gmail.com",
+      pass: "apkv zxfc jqwk ikju",
     },
   });
 

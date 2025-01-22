@@ -14,6 +14,8 @@ import { TUser } from "./user.interface";
 import { User } from "./user.model";
 import { generateAdminId, generateFacultyId, generateStudentId } from "./user.utils";
 
+//! need change in image upload for admin and faculty check create student
+
 const createStudentIntoDB = async (file: any, password: string, payload: TStudent) => {
   //create a user obj
   const userData: Partial<TUser> = {};
@@ -31,6 +33,14 @@ const createStudentIntoDB = async (file: any, password: string, payload: TStuden
     throw new AppError(StatusCodes.NOT_FOUND, "Admission semester not found.");
   }
 
+  // find department
+  const academicDepartment = await AcademicDepartment.findById(payload.academicDepartment);
+
+  if (!academicDepartment) {
+    throw new AppError(400, "Aademic department not found");
+  }
+  payload.academicFaculty = academicDepartment.academicFaculty;
+
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -38,10 +48,14 @@ const createStudentIntoDB = async (file: any, password: string, payload: TStuden
     //set id
     userData.id = await generateStudentId(admissionSemester);
 
-    // send img to cloudinary
-    const imageName = `${userData.id}${payload?.name?.firstName}`;
-    const path = file?.path;
-    const uploadResult = await sendImageToCloudinary(imageName, path);
+    if (file) {
+      // send img to cloudinary
+      const imageName = `${userData.id}${payload?.name?.firstName}`;
+      const path = file?.path;
+
+      const uploadResult = await sendImageToCloudinary(imageName, path);
+      payload.profileImg = uploadResult?.secure_url;
+    }
 
     // create user (transaction 1)
     const newUser = await User.create([userData], { session }); //array
@@ -53,7 +67,6 @@ const createStudentIntoDB = async (file: any, password: string, payload: TStuden
     //set id, _id in student
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //ref id
-    payload.profileImg = uploadResult?.secure_url;
 
     // create student (transaction 2)
     const newStudent = await Student.create([payload], { session });
