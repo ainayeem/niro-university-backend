@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get("/", auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty), OfferedCourseControllers.getAllOfferedCourses);
 
-// router.get("/my-offered-courses", auth(USER_ROLE.student), OfferedCourseControllers.getMyOfferedCourses);
+router.get("/my-offered-courses", auth(USER_ROLE.student), OfferedCourseControllers.getMyOfferedCourses);
 
 router.get(
   "/:id",

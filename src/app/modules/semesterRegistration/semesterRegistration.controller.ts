@@ -22,7 +22,8 @@ const getAllSemesterRegistrations = catchAsync(async (req: Request, res: Respons
     statusCode: StatusCodes.OK,
     success: true,
     message: "Semester Registration is retrieved successfully !",
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 

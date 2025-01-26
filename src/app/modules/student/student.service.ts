@@ -9,15 +9,7 @@ import { Student } from "./student.model";
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   const studentQuery = new QueryBuilder(
-    Student.find()
-      .populate("user")
-      .populate("admissionSemester")
-      .populate({
-        path: "academicDepartment",
-        populate: {
-          path: "academicFaculty",
-        },
-      }),
+    Student.find().populate("user").populate("admissionSemester").populate("academicDepartment academicFaculty"),
     query,
   )
     .search(studentSearchableFields)

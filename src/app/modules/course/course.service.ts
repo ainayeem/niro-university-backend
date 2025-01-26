@@ -12,11 +12,7 @@ const createCourseIntoDB = async (payload: TCourse) => {
 };
 
 const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
-  const courseQuery = new QueryBuilder(
-    Course.find(),
-    // .populate('preRequisiteCourses.course'),
-    query,
-  )
+  const courseQuery = new QueryBuilder(Course.find().populate("preRequisiteCourses.course"), query)
     .search(CourseSearchableFields)
     .filter()
     .sort()
@@ -24,7 +20,12 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await courseQuery.modelQuery;
-  return result;
+  const meta = await courseQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
 };
 
 const getSingleCourseFromDB = async (id: string) => {
@@ -132,6 +133,11 @@ const assignFacultiesWithCourseIntoDB = async (id: string, payload: Partial<TCou
   return result;
 };
 
+const getFacultiesWithCourseFromDB = async (courseId: string) => {
+  const result = await CourseFaculty.findOne({ course: courseId }).populate("faculties");
+  return result;
+};
+
 const removeFacultiesFromCourseFromDB = async (id: string, payload: Partial<TCoursefaculty>) => {
   const result = await CourseFaculty.findByIdAndUpdate(
     id,
@@ -152,5 +158,6 @@ export const CourseServices = {
   updateCourseIntoDB,
   deleteCourseFromDB,
   assignFacultiesWithCourseIntoDB,
+  getFacultiesWithCourseFromDB,
   removeFacultiesFromCourseFromDB,
 };

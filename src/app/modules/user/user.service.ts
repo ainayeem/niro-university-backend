@@ -102,6 +102,8 @@ const createFacultyIntoDB = async (file: any, password: string, payload: TFacult
     throw new AppError(StatusCodes.NOT_FOUND, "Academic department not found");
   }
 
+  payload.academicFaculty = academicDepartment?.academicFaculty;
+
   const session = await mongoose.startSession();
 
   try {

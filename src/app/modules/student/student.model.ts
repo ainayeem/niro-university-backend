@@ -70,10 +70,14 @@ const localGuradianSchema = new Schema<TLocalGuardian>({
 
 const studentSchema = new Schema<TStudent, StudentModel>(
   {
-    id: { type: String, required: [true, "ID is required"], unique: true },
+    id: {
+      type: String,
+      required: [true, "ID is required"],
+      unique: true,
+    },
     user: {
       type: Schema.Types.ObjectId,
-      required: [true, "userID is required"],
+      required: [true, "User id is required"],
       unique: true,
       ref: "User",
     },
@@ -123,18 +127,22 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: localGuradianSchema,
       required: [true, "Local guardian information is required"],
     },
-    profileImg: { type: String },
+    profileImg: { type: String, default: "" },
     admissionSemester: {
       type: Schema.Types.ObjectId,
       ref: "AcademicSemester",
     },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
     academicDepartment: {
       type: Schema.Types.ObjectId,
       ref: "AcademicDepartment",
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: "AcademicFaculty",
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -146,7 +154,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 
 // virtual
 studentSchema.virtual("fullName").get(function () {
-  return this?.name?.firstName + this?.name?.middleName + this?.name?.lastName;
+  return this?.name?.firstName + " " + this?.name?.middleName + " " + this?.name?.lastName;
 });
 
 // Query Middleware
