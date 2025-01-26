@@ -14,8 +14,6 @@ import { TUser } from "./user.interface";
 import { User } from "./user.model";
 import { generateAdminId, generateFacultyId, generateStudentId } from "./user.utils";
 
-//! need change in image upload for admin and faculty check create student
-
 const createStudentIntoDB = async (file: any, password: string, payload: TStudent) => {
   //create a user obj
   const userData: Partial<TUser> = {};
@@ -112,10 +110,14 @@ const createFacultyIntoDB = async (file: any, password: string, payload: TFacult
     //set generated id
     userData.id = await generateFacultyId();
 
-    // send img to cloudinary
-    const imageName = `${userData.id}${payload?.name?.firstName}`;
-    const path = file?.path;
-    const uploadResult = await sendImageToCloudinary(imageName, path);
+    if (file) {
+      // send img to cloudinary
+      const imageName = `${userData.id}${payload?.name?.firstName}`;
+      const path = file?.path;
+
+      const uploadResult = await sendImageToCloudinary(imageName, path);
+      payload.profileImg = uploadResult?.secure_url;
+    }
 
     // create user (t-1)
     const newUser = await User.create([userData], { session }); // array
@@ -127,7 +129,6 @@ const createFacultyIntoDB = async (file: any, password: string, payload: TFacult
     // set id , _id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
-    payload.profileImg = uploadResult?.secure_url;
 
     // create a faculty (transaction-2)
 
@@ -166,10 +167,14 @@ const createAdminIntoDB = async (file: any, password: string, payload: TFaculty)
     //set  generated id
     userData.id = await generateAdminId();
 
-    // send img to cloudinary
-    const imageName = `${userData.id}${payload?.name?.firstName}`;
-    const path = file?.path;
-    const uploadResult = await sendImageToCloudinary(imageName, path);
+    if (file) {
+      // send img to cloudinary
+      const imageName = `${userData.id}${payload?.name?.firstName}`;
+      const path = file?.path;
+
+      const uploadResult = await sendImageToCloudinary(imageName, path);
+      payload.profileImg = uploadResult?.secure_url;
+    }
 
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session });
@@ -181,7 +186,6 @@ const createAdminIntoDB = async (file: any, password: string, payload: TFaculty)
     // set id , _id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
-    payload.profileImg = uploadResult?.secure_url;
 
     // create a admin (transaction-2)
     const newAdmin = await Admin.create([payload], { session });
